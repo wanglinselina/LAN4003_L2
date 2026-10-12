@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>T Hotel 小組研習工作紙 - 協作與批改系統</title>
+    <title>T Hotel 小組議論文寫作協作與批改平台</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- docx.js 用於生成 Word 文件 -->
     <script src="https://unpkg.com/docx@7.3.0/build/index.js"></script>
     <!-- FileSaver.js 用於觸發檔案下載 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    <!-- mammoth.js 用於組長讀取組員上傳的 Word 檔內容 -->
+    <!-- mammoth.js 用於讀取 Word 檔內容 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+HK:wght@400;500;700&display=swap');
@@ -22,9 +22,9 @@
     <!-- 頂部導覽列 -->
     <header class="bg-indigo-700 text-white shadow-md">
         <div class="max-w-5xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center">
-            <h1 class="text-xl font-bold">🏨 T Hotel 小組研習工作紙與批改系統</h1>
+            <h1 class="text-xl font-bold">🏨 T Hotel 議論文寫作協作與批改平台</h1>
             <div class="mt-2 sm:mt-0 flex gap-2">
-                <button onclick="switchMode('member')" id="btn-member" class="px-3 py-2 rounded-lg bg-indigo-800 text-white font-medium text-sm transition shadow">1. 組員分工填寫</button>
+                <button onclick="switchMode('member')" id="btn-member" class="px-3 py-2 rounded-lg bg-indigo-800 text-white font-medium text-sm transition shadow">1. 組員單一論點填寫</button>
                 <button onclick="switchMode('leader')" id="btn-leader" class="px-3 py-2 rounded-lg bg-indigo-600 text-white font-medium text-sm transition hover:bg-indigo-800">2. 組長統整匯出</button>
                 <button onclick="switchMode('teacher')" id="btn-teacher" class="px-3 py-2 rounded-lg bg-indigo-600 text-white font-medium text-sm transition hover:bg-indigo-800">3. 老師批改與反饋</button>
             </div>
@@ -37,82 +37,53 @@
         <!-- 提示橫幅 -->
         <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 rounded-r-lg shadow-sm">
             <p class="text-sm text-blue-700 font-medium" id="mode-tip">
-                👉 當前為【組員模式】：請選擇您負責的模組獨立完成，完成後可下載個人 Word 檔或複製文字代碼交給組長。
+                👉 當前為【組員模式】：每位組員負責完成「一個分論點」與「對應充份論據」，完成後下載個人 Word 檔或複製代碼交給組長。
             </p>
         </div>
 
-        <!-- ==================== 1. 組員分工填寫模式 ==================== -->
+        <!-- ==================== 1. 組員單一論點填寫模式 ==================== -->
         <div id="section-member" class="space-y-6">
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                <h2 class="text-lg font-bold text-slate-700 mb-4 flex items-center gap-2">
-                    <span>👤</span> 選擇您負責的組員分工模組
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <h2 class="text-lg font-bold text-slate-700 flex items-center gap-2">
+                    <span>👤</span> 個人填寫區（每人負責 1 個分論點與論據）
                 </h2>
-                <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-6">
-                    <button onclick="selectModule(1)" id="mod-btn-1" class="p-3 text-sm rounded-lg border-2 border-indigo-600 bg-indigo-50 font-semibold text-indigo-700 transition">模組一：推薦與中心論點</button>
-                    <button onclick="selectModule(2)" id="mod-btn-2" class="p-3 text-sm rounded-lg border-2 border-slate-200 bg-white font-semibold text-slate-600 transition hover:border-indigo-300">模組二：分論點一與二</button>
-                    <button onclick="selectModule(3)" id="mod-btn-3" class="p-3 text-sm rounded-lg border-2 border-slate-200 bg-white font-semibold text-slate-600 transition hover:border-indigo-300">模組三：分論點三與其他</button>
-                    <button onclick="selectModule(4)" id="mod-btn-4" class="p-3 text-sm rounded-lg border-2 border-slate-200 bg-white font-semibold text-slate-600 transition hover:border-indigo-300">模組四：重申立場</button>
-                </div>
+                <p class="text-xs text-slate-500">考核重點：**論點清晰、論據充份**。請依據考察資料獨立完成您的專屬分論點。</p>
 
-                <!-- 模組 1 -->
-                <div class="module-content space-y-4" id="module-1">
-                    <h3 class="font-bold text-indigo-700 text-md border-b pb-2">【模組一】推薦方向與中心論點</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">推薦的方向</label>
-                        <input type="text" id="m1-direction" class="w-full rounded-lg border border-slate-300 p-2.5 text-sm outline-none focus:ring-2 focus:ring-indigo-500" placeholder="請根據考察資料填寫...">
+                        <input type="text" id="mp-direction" class="w-full rounded-lg border border-slate-300 p-2.5 text-sm outline-none focus:ring-2 focus:ring-indigo-500" placeholder="例如：酒店環境、住宿空間、設計裝潢">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">建立中心論點</label>
-                        <textarea id="m1-core" rows="3" class="w-full rounded-lg border border-slate-300 p-2.5 text-sm outline-none focus:ring-2 focus:ring-indigo-500" placeholder="請歸納並建立本組的核心論點..."></textarea>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">中心論點</label>
+                        <input type="text" id="mp-core" class="w-full rounded-lg border border-slate-300 p-2.5 text-sm outline-none focus:ring-2 focus:ring-indigo-500" placeholder="例如：T酒店是環境優美、設計別具特色的酒店">
                     </div>
                 </div>
 
-                <!-- 模組 2 -->
-                <div class="module-content space-y-4 hidden" id="module-2">
-                    <h3 class="font-bold text-indigo-700 text-md border-b pb-2">【模組二】分論點一與分論點二</h3>
-                    <div class="bg-slate-50 p-4 rounded-lg space-y-3 border">
-                        <h4 class="font-semibold text-sm text-slate-700">分論點一</h4>
-                        <input type="text" id="m2-p1-title" class="w-full rounded-lg border border-slate-300 p-2 text-sm bg-white" placeholder="分論點標題">
-                        <textarea id="m2-p1-arg" rows="3" class="w-full rounded-lg border border-slate-300 p-2 text-sm bg-white" placeholder="請詳細列出論據及資料引述..."></textarea>
-                    </div>
-                    <div class="bg-slate-50 p-4 rounded-lg space-y-3 border">
-                        <h4 class="font-semibold text-sm text-slate-700">分論點二</h4>
-                        <input type="text" id="m2-p2-title" class="w-full rounded-lg border border-slate-300 p-2 text-sm bg-white" placeholder="分論點標題">
-                        <textarea id="m2-p2-arg" rows="3" class="w-full rounded-lg border border-slate-300 p-2 text-sm bg-white" placeholder="請詳細列出論據及資料引述..."></textarea>
-                    </div>
-                </div>
-
-                <!-- 模組 3 -->
-                <div class="module-content space-y-4 hidden" id="module-3">
-                    <h3 class="font-bold text-indigo-700 text-md border-b pb-2">【模組三】分論點三與其他分論點</h3>
-                    <div class="bg-slate-50 p-4 rounded-lg space-y-3 border">
-                        <h4 class="font-semibold text-sm text-slate-700">分論點三</h4>
-                        <input type="text" id="m3-p3-title" class="w-full rounded-lg border border-slate-300 p-2 text-sm bg-white" placeholder="分論點標題">
-                        <textarea id="m3-p3-arg" rows="3" class="w-full rounded-lg border border-slate-300 p-2 text-sm bg-white" placeholder="請詳細列出論據及資料引述..."></textarea>
-                    </div>
-                    <div class="bg-slate-50 p-4 rounded-lg space-y-3 border">
-                        <h4 class="font-semibold text-sm text-slate-700">其他分論點（如服務等）</h4>
-                        <input type="text" id="m3-p4-title" class="w-full rounded-lg border border-slate-300 p-2 text-sm bg-white" placeholder="分論點標題">
-                        <textarea id="m3-p4-arg" rows="3" class="w-full rounded-lg border border-slate-300 p-2 text-sm bg-white" placeholder="請詳細列出論據及資料引述..."></textarea>
-                    </div>
-                </div>
-
-                <!-- 模組 4 -->
-                <div class="module-content space-y-4 hidden" id="module-4">
-                    <h3 class="font-bold text-indigo-700 text-md border-b pb-2">【模組四】重申立場／觀點</h3>
+                <div class="bg-slate-50 p-4 rounded-lg space-y-3 border border-indigo-100">
+                    <h3 class="font-bold text-indigo-700 text-sm">📌 我的專屬分論點與論據</h3>
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">重申立場／觀點</label>
-                        <textarea id="m4-conclusion" rows="4" class="w-full rounded-lg border border-slate-300 p-2.5 text-sm outline-none focus:ring-2 focus:ring-indigo-500" placeholder="總結全文與核心觀點..."></textarea>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">分論點標題（要求：清晰明確）</label>
+                        <input type="text" id="mp-title" class="w-full rounded-lg border border-slate-300 p-2.5 text-sm bg-white" placeholder="例如：酒店環境優美寧靜，背山面海">
                     </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">充份論據（要求：具體引述資料來源、數據或旅客評語）</label>
+                        <textarea id="mp-arg" rows="4" class="w-full rounded-lg border border-slate-300 p-2.5 text-sm bg-white" placeholder="根據資料一及資料三..."></textarea>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">重申立場／觀點（選填或組長負責）</label>
+                    <textarea id="mp-conclusion" rows="2" class="w-full rounded-lg border border-slate-300 p-2.5 text-sm" placeholder="總結觀點..."></textarea>
                 </div>
 
                 <!-- 組員導出選項 -->
                 <div class="mt-6 pt-4 border-t flex flex-col sm:flex-row justify-between items-center gap-4">
                     <div class="flex gap-2 w-full sm:w-auto">
-                        <button onclick="exportSingleModuleWord()" class="bg-emerald-600 text-white px-4 py-2.5 rounded-lg font-medium text-xs hover:bg-emerald-700 transition shadow">
-                            📥 下載我的個人 Word 檔
+                        <button onclick="exportPersonalWord()" class="bg-emerald-600 text-white px-4 py-2.5 rounded-lg font-medium text-xs hover:bg-emerald-700 transition shadow">
+                            📥 下載我的個人論點 Word 檔
                         </button>
-                        <button onclick="generateModuleCode()" class="bg-indigo-600 text-white px-4 py-2.5 rounded-lg font-medium text-xs hover:bg-indigo-700 transition shadow">
+                        <button onclick="generatePersonalCode()" class="bg-indigo-600 text-white px-4 py-2.5 rounded-lg font-medium text-xs hover:bg-indigo-700 transition shadow">
                             📋 複製文字代碼
                         </button>
                     </div>
@@ -126,12 +97,12 @@
         <!-- ==================== 2. 組長統整模式區 ==================== -->
         <div id="section-leader" class="space-y-6 hidden">
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-6">
-                <h2 class="text-lg font-bold text-slate-700 border-b pb-4">👑 組長統整與上傳匯出區</h2>
+                <h2 class="text-lg font-bold text-slate-700 border-b pb-4">👑 組長統整與匯出區</h2>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-600 mb-1">小組組員名單</label>
-                        <input type="text" id="group-members" class="w-full rounded-lg border border-slate-300 p-2 text-sm" placeholder="例如：陳大文、張小明">
+                        <input type="text" id="group-members" class="w-full rounded-lg border border-slate-300 p-2 text-sm" placeholder="例如：陳大文、張小明、李麗華">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-600 mb-1">組別</label>
@@ -139,61 +110,41 @@
                     </div>
                 </div>
 
-                <!-- 支援組員上傳 Word 檔或貼代碼 -->
+                <!-- 導入組員內容 -->
                 <div class="space-y-4 bg-slate-50 p-4 rounded-xl border">
-                    <h3 class="text-sm font-bold text-slate-700">📥 導入方式（二選一：貼代碼 或 上傳組員 Word 檔）</h3>
+                    <h3 class="text-sm font-bold text-slate-700">📥 匯入組員分論點（支援貼上文字代碼 或 上傳組員 Word 檔）</h3>
                     
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <input type="text" id="import-code-1" placeholder="貼上模組一代碼..." class="p-2 text-xs border rounded bg-white">
-                        <input type="text" id="import-code-2" placeholder="貼上模組二代碼..." class="p-2 text-xs border rounded bg-white">
-                        <input type="text" id="import-code-3" placeholder="貼上模組三代碼..." class="p-2 text-xs border rounded bg-white">
-                        <input type="text" id="import-code-4" placeholder="貼上模組四代碼..." class="p-2 text-xs border rounded bg-white">
+                    <div class="flex gap-2">
+                        <input type="text" id="import-code-input" placeholder="貼上組員產生的文字代碼..." class="p-2 text-xs border rounded bg-white flex-grow">
+                        <button onclick="importPersonalCode()" class="bg-slate-700 text-white px-4 py-2 rounded text-xs font-medium hover:bg-slate-800">加入分論點</button>
                     </div>
-                    <button onclick="importAllCodes()" class="w-full bg-slate-700 text-white py-2 rounded-lg text-xs font-medium hover:bg-slate-800 transition">
-                        ⚡ 執行文字代碼合併
-                    </button>
 
                     <div class="pt-2 border-t">
-                        <label class="block text-xs font-bold text-slate-600 mb-1">或者：上傳組員的個人 Word 檔 (.docx) 自動讀取</label>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">或者：上傳組員的個人 Word 檔 (.docx) 自動提取</label>
                         <input type="file" id="upload-member-doc" accept=".docx" onchange="handleMemberDocUpload(this)" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
                     </div>
                 </div>
 
                 <!-- 統整預覽與微調 -->
                 <div class="space-y-4 border-t pt-4">
-                    <h3 class="text-md font-bold text-slate-700">📝 小組完整內容統整預覽（可直接手動修改潤飾）</h3>
+                    <h3 class="text-md font-bold text-slate-700">📝 小組完整內容統整預覽（各成員的分論點與論據）</h3>
                     
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">推薦的方向</label>
-                        <input type="text" id="all-direction" class="w-full rounded-lg border border-slate-300 p-2.5 text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">建立中心論點</label>
-                        <textarea id="all-core" rows="2" class="w-full rounded-lg border border-slate-300 p-2.5 text-sm"></textarea>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">推薦的方向</label>
+                            <input type="text" id="all-direction" class="w-full rounded-lg border border-slate-300 p-2.5 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">中心論點</label>
+                            <input type="text" id="all-core" class="w-full rounded-lg border border-slate-300 p-2.5 text-sm">
+                        </div>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div class="space-y-2 p-3 border rounded-lg bg-slate-50">
-                            <span class="text-xs font-bold text-indigo-700">分論點一</span>
-                            <input type="text" id="all-p1-title" class="w-full p-2 text-xs border rounded bg-white" placeholder="標題">
-                            <textarea id="all-p1-arg" rows="3" class="w-full p-2 text-xs border rounded bg-white" placeholder="論據"></textarea>
-                        </div>
-                        <div class="space-y-2 p-3 border rounded-lg bg-slate-50">
-                            <span class="text-xs font-bold text-indigo-700">分論點二</span>
-                            <input type="text" id="all-p2-title" class="w-full p-2 text-xs border rounded bg-white" placeholder="標題">
-                            <textarea id="all-p2-arg" rows="3" class="w-full p-2 text-xs border rounded bg-white" placeholder="論據"></textarea>
-                        </div>
-                        <div class="space-y-2 p-3 border rounded-lg bg-slate-50">
-                            <span class="text-xs font-bold text-indigo-700">分論點三</span>
-                            <input type="text" id="all-p3-title" class="w-full p-2 text-xs border rounded bg-white" placeholder="標題">
-                            <textarea id="all-p3-arg" rows="3" class="w-full p-2 text-xs border rounded bg-white" placeholder="論據"></textarea>
-                        </div>
-                        <div class="space-y-2 p-3 border rounded-lg bg-slate-50">
-                            <span class="text-xs font-bold text-indigo-700">其他分論點</span>
-                            <input type="text" id="all-p4-title" class="w-full p-2 text-xs border rounded bg-white" placeholder="標題">
-                            <textarea id="all-p4-arg" rows="3" class="w-full p-2 text-xs border rounded bg-white" placeholder="論據"></textarea>
-                        </div>
+                    <!-- 動態分論點列表容器 -->
+                    <div id="leader-arguments-container" class="space-y-4">
+                        <!-- 預設會顯示 2 個範例或已匯入的分論點 -->
                     </div>
+                    <button onclick="addEmptyArgumentField()" class="text-xs bg-slate-200 text-slate-700 px-3 py-1.5 rounded hover:bg-slate-300 font-medium">+ 手動新增分論點</button>
 
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">重申立場／觀點</label>
@@ -212,40 +163,45 @@
         <!-- ==================== 3. 老師批改與反饋模式區 ==================== -->
         <div id="section-teacher" class="space-y-6 hidden">
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-6">
-                <h2 class="text-lg font-bold text-slate-700 border-b pb-4">🍎 老師批改、評分與反饋區</h2>
+                <h2 class="text-lg font-bold text-slate-700 border-b pb-4">🍎 老師批改與反饋區（重點考核：論點清晰度、論據充份性）</h2>
 
                 <div class="bg-amber-50 p-4 rounded-lg border border-amber-200 space-y-3">
                     <h3 class="text-sm font-bold text-amber-800">📋 學生作業上傳與讀取</h3>
-                    <p class="text-xs text-amber-700">老師可直接上傳學生小組交上來的 `.docx` 作業檔案，系統將自動載入內容至下方，供老師批改。</p>
+                    <p class="text-xs text-amber-700">老師可上傳小組作業 `.docx` 檔案，系統將自動載入內容供評閱。</p>
                     <input type="file" id="upload-student-doc" accept=".docx" onchange="handleStudentDocUpload(this)" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-100 file:text-amber-800 hover:file:bg-amber-200">
                 </div>
 
-                <!-- 評分與評語輸入區 -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">給予成績（滿分 100 分）</label>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">總成績（滿分 100 分）</label>
                         <input type="number" id="teacher-score" class="w-full rounded-lg border border-slate-300 p-2.5 text-sm font-bold text-indigo-700" placeholder="例如：88">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">評語等級</label>
-                        <select id="teacher-grade" class="w-full rounded-lg border border-slate-300 p-2.5 text-sm bg-white">
-                            <option value="優秀 (Distinction)">優秀 (Distinction)</option>
-                            <option value="良好 (Credit)" selected>良好 (Credit)</option>
-                            <option value="合格 (Pass)">合格 (Pass)</option>
-                            <option value="需再努力 (Needs Improvement)">需再努力 (Needs Improvement)</option>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">論點清晰度評級</label>
+                        <select id="teacher-grade-thesis" class="w-full rounded-lg border border-slate-300 p-2.5 text-sm bg-white">
+                            <option value="各分論點極為清晰明確">各分論點極為清晰明確</option>
+                            <option value="論點尚算清晰，唯部分可再精煉" selected>論點尚算清晰，唯部分可再精煉</option>
+                            <option value="論點模糊，未能直接點出核心">論點模糊，未能直接點出核心</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">論據充份性評級</label>
+                        <select id="teacher-grade-evidence" class="w-full rounded-lg border border-slate-300 p-2.5 text-sm bg-white">
+                            <option value="論據極為充份、具體且緊扣論點">論據極為充份、具體且緊扣論點</option>
+                            <option value="論據尚算充份，惟數據或細節可再豐富" selected>論據尚算充份，惟數據或細節可再豐富</option>
+                            <option value="論據空泛或未有確實引述資料">論據空泛或未有確實引述資料</option>
                         </select>
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">具體評語與反饋（針對論點結構、資料引述、文字表達）</label>
-                    <textarea id="teacher-feedback" rows="4" class="w-full rounded-lg border border-slate-300 p-2.5 text-sm" placeholder="例如：整體論證結構清晰，資料引述具體。唯分論點三的數據分析可再深入..."></textarea>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">具體反饋與改善建議</label>
+                    <textarea id="teacher-feedback" rows="4" class="w-full rounded-lg border border-slate-300 p-2.5 text-sm" placeholder="例如：各組員的分論點切中要害，論據引述具體。建議第二個分論點的數據引用可以更精確..."></textarea>
                 </div>
 
-                <!-- 匯出帶有批改結果的 Word -->
                 <div class="pt-4 border-t">
                     <button onclick="exportWord('teacher')" class="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold text-base hover:bg-emerald-700 transition shadow-lg flex items-center justify-center gap-2">
-                        📥 導出包含【老師評分與批改反饋】的 Word 檔案發還學生
+                        📥 導出包含【論點/論據批改反饋】的 Word 檔案發還學生
                     </button>
                 </div>
             </div>
@@ -255,12 +211,15 @@
 
     <!-- 頁尾 -->
     <footer class="bg-slate-200 text-slate-600 text-center py-4 text-xs mt-auto">
-        T Hotel 小組研習工作紙與批改系統 © 2026
+        T Hotel 議論文寫作協作與批改平台 © 2026
     </footer>
 
     <!-- JavaScript 邏輯控制 -->
     <script>
-        let currentModule = 1;
+        let groupArguments = [
+            { title: "酒店環境優美寧靜", arg: "根據資料一：酒店背山面海，環境優美寧靜。旁邊就是郊野公園，非常適合度假放鬆。" },
+            { title: "住宿空間寬敞舒適", arg: "根據資料四，T酒店最小的房間都有四百多呎，海景套房更超過一千呎，寬敞舒適。" }
+        ];
 
         function switchMode(mode) {
             const memberSec = document.getElementById('section-member');
@@ -281,118 +240,74 @@
             if (mode === 'member') {
                 memberSec.classList.remove('hidden');
                 btnMember.className = "px-3 py-2 rounded-lg bg-indigo-800 text-white font-medium text-sm transition shadow";
-                modeTip.innerText = "👉 當前為【組員模式】：請選擇您負責的模組獨立完成，完成後可下載個人 Word 檔或複製文字代碼交給組長。";
+                modeTip.innerText = "👉 當前為【組員模式】：每位組員負責完成「一個分論點」與「對應充份論據」，完成後下載個人 Word 檔或複製代碼交給組長。";
             } else if (mode === 'leader') {
                 leaderSec.classList.remove('hidden');
                 btnLeader.className = "px-3 py-2 rounded-lg bg-indigo-800 text-white font-medium text-sm transition shadow";
-                modeTip.innerText = "👑 當前為【組長模式】：請貼上各組員代碼或上傳組員 Word 檔進行統整預覽，確認後下載完整作業交給老師。";
-                collectAllToLeaderPreview();
+                modeTip.innerText = "👑 當前為【組長模式】：請匯入各組員的分論點與論據進行統整預覽，確認後下載完整作業交給老師。";
+                renderLeaderArguments();
             } else if (mode === 'teacher') {
                 teacherSec.classList.remove('hidden');
                 btnTeacher.className = "px-3 py-2 rounded-lg bg-indigo-800 text-white font-medium text-sm transition shadow";
-                modeTip.innerText = "🍎 當前為【老師批改模式】：可上傳學生作業，給予評分與反饋後導出帶有批改結果的檔案發還學生。";
+                modeTip.innerText = "🍎 當前為【老師批改模式】：可上傳學生作業，針對『論點清晰度』與『論據充份性』給予評分與反饋後導出發還學生。";
             }
         }
 
-        function selectModule(modNum) {
-            currentModule = modNum;
-            for (let i = 1; i <= 4; i++) {
-                document.getElementById(`module-${i}`).classList.add('hidden');
-                document.getElementById(`mod-btn-${i}`).className = "p-3 text-sm rounded-lg border-2 border-slate-200 bg-white font-semibold text-slate-600 transition hover:border-indigo-300";
-            }
-            document.getElementById(`module-${modNum}`).classList.remove('hidden');
-            document.getElementById(`mod-btn-${modNum}`).className = "p-3 text-sm rounded-lg border-2 border-indigo-600 bg-indigo-50 font-semibold text-indigo-700 transition";
+        function getPersonalData() {
+            return {
+                direction: document.getElementById('mp-direction').value,
+                core: document.getElementById('mp-core').value,
+                title: document.getElementById('mp-title').value,
+                arg: document.getElementById('mp-arg').value,
+                conclusion: document.getElementById('mp-conclusion').value
+            };
         }
 
-        function getModuleData(modNum) {
-            let data = {};
-            if (modNum === 1) {
-                data = { direction: document.getElementById('m1-direction').value, core: document.getElementById('m1-core').value };
-            } else if (modNum === 2) {
-                data = {
-                    p1Title: document.getElementById('m2-p1-title').value, p1Arg: document.getElementById('m2-p1-arg').value,
-                    p2Title: document.getElementById('m2-p2-title').value, p2Arg: document.getElementById('m2-p2-arg').value
-                };
-            } else if (modNum === 3) {
-                data = {
-                    p3Title: document.getElementById('m3-p3-title').value, p3Arg: document.getElementById('m3-p3-arg').value,
-                    p4Title: document.getElementById('m3-p4-title').value, p4Arg: document.getElementById('m3-p4-arg').value
-                };
-            } else if (modNum === 4) {
-                data = { conclusion: document.getElementById('m4-conclusion').value };
-            }
-            return data;
-        }
-
-        function generateModuleCode() {
-            const data = getModuleData(currentModule);
+        function generatePersonalCode() {
+            const data = getPersonalData();
             const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
-            const fullCode = `MOD${currentModule}:${encoded}`;
+            const fullCode = `MEMBER_ARG:${encoded}`;
             document.getElementById('member-output-code').value = fullCode;
             navigator.clipboard.writeText(fullCode);
-            alert(`模組 ${currentModule} 文字代碼已複製到剪貼簿！`);
+            alert("您的分論點與論據代碼已複製到剪貼簿！");
         }
 
-        // 組員下載個人 Word 檔
-        function exportSingleModuleWord() {
-            const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, AlignmentType } = window.docx;
-            const data = getModuleData(currentModule);
+        function exportPersonalWord() {
+            const { Document, Packer, Paragraph, TextRun } = window.docx;
+            const data = getPersonalData();
 
-            let docChildren = [
-                new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: `T Hotel 工作紙 - 模組 ${currentModule}`, bold: true, size: 28, font: "Microsoft JhengHei" })] }),
-                new Paragraph({ spacing: { after: 300 }, children: [] })
-            ];
+            const doc = new Document({
+                sections: [{
+                    properties: {},
+                    children: [
+                        new Paragraph({ children: [new TextRun({ text: "T Hotel 個人分論點練習", bold: true, size: 28, font: "Microsoft JhengHei" })] }),
+                        new Paragraph({ children: [new TextRun({ text: `推薦方向：${data.direction}`, font: "Microsoft JhengHei" })] }),
+                        new Paragraph({ children: [new TextRun({ text: `中心論點：${data.core}`, font: "Microsoft JhengHei" })] }),
+                        new Paragraph({ children: [new TextRun({ text: `分論點：${data.title}`, bold: true, font: "Microsoft JhengHei" })] }),
+                        new Paragraph({ children: [new TextRun({ text: `充份論據：${data.arg}`, font: "Microsoft JhengHei" })] }),
+                        new Paragraph({ children: [new TextRun({ text: `重申立場：${data.conclusion}`, font: "Microsoft JhengHei" })] })
+                    ]
+                }]
+            });
+            Packer.toBlob(doc).then(blob => { saveAs(blob, `T_Hotel_個人分論點作業.docx`); });
+        }
 
-            if (currentModule === 1) {
-                docChildren.push(new Paragraph({ children: [new TextRun({ text: "推薦方向：", bold: true }), new TextRun({ text: data.direction || "" })] }));
-                docChildren.push(new Paragraph({ children: [new TextRun({ text: "中心論點：", bold: true }), new TextRun({ text: data.core || "" })] }));
-            } else if (currentModule === 2) {
-                docChildren.push(new Paragraph({ children: [new TextRun({ text: "分論點一標題：" + (data.p1Title||""), bold: true })] }));
-                docChildren.push(new Paragraph({ children: [new TextRun({ text: "論據：" + (data.p1Arg||"") })] }));
-                docChildren.push(new Paragraph({ children: [new TextRun({ text: "分論點二標題：" + (data.p2Title||""), bold: true })] }));
-                docChildren.push(new Paragraph({ children: [new TextRun({ text: "論據：" + (data.p2Arg||"") })] }));
-            } else if (currentModule === 3) {
-                docChildren.push(new Paragraph({ children: [new TextRun({ text: "分論點三標題：" + (data.p3Title||""), bold: true })] }));
-                docChildren.push(new Paragraph({ children: [new TextRun({ text: "論據：" + (data.p3Arg||"") })] }));
-                docChildren.push(new Paragraph({ children: [new TextRun({ text: "其他分論點標題：" + (data.p4Title||""), bold: true })] }));
-                docChildren.push(new Paragraph({ children: [new TextRun({ text: "論據：" + (data.p4Arg||"") })] }));
-            } else if (currentModule === 4) {
-                docChildren.push(new Paragraph({ children: [new TextRun({ text: "重申立場／觀點：", bold: true }), new TextRun({ text: data.conclusion || "" })] }));
+        function importPersonalCode() {
+            let code = document.getElementById('import-code-input').value.trim();
+            if (code.startsWith("MEMBER_ARG:")) {
+                try {
+                    let data = JSON.parse(decodeURIComponent(escape(atob(code.split(':')[1]))));
+                    if(data.direction) document.getElementById('all-direction').value = data.direction;
+                    if(data.core) document.getElementById('all-core').value = data.core;
+                    if(data.title && data.arg) {
+                        groupArguments.push({ title: data.title, arg: data.arg });
+                        renderLeaderArguments();
+                    }
+                    alert("已成功將組員的分論點與論據加入統整列表！");
+                } catch(e) { alert("代碼解析失敗"); }
             }
-
-            const doc = new Document({ sections: [{ properties: {}, children: docChildren }] });
-            Packer.toBlob(doc).then(blob => { saveAs(blob, `T_Hotel_模組${currentModule}_個人檔案.docx`); });
         }
 
-        function importAllCodes() {
-            for (let i = 1; i <= 4; i++) {
-                let codeInput = document.getElementById(`import-code-${i}`).value.trim();
-                if (codeInput.startsWith(`MOD${i}:`)) {
-                    try {
-                        let data = JSON.parse(decodeURIComponent(escape(atob(codeInput.split(':')[1]))));
-                        if (i === 1) {
-                            if(data.direction) document.getElementById('all-direction').value = data.direction;
-                            if(data.core) document.getElementById('all-core').value = data.core;
-                        } else if (i === 2) {
-                            if(data.p1Title) document.getElementById('all-p1-title').value = data.p1Title;
-                            if(data.p1Arg) document.getElementById('all-p1-arg').value = data.p1Arg;
-                            if(data.p2Title) document.getElementById('all-p2-title').value = data.p2Title;
-                            if(data.p2Arg) document.getElementById('all-p2-arg').value = data.p2Arg;
-                        } else if (i === 3) {
-                            if(data.p3Title) document.getElementById('all-p3-title').value = data.p3Title;
-                            if(data.p3Arg) document.getElementById('all-p3-arg').value = data.p3Arg;
-                            if(data.p4Title) document.getElementById('all-p4-title').value = data.p4Title;
-                            if(data.p4Arg) document.getElementById('all-p4-arg').value = data.p4Arg;
-                        } else if (i === 4) {
-                            if(data.conclusion) document.getElementById('all-conclusion').value = data.conclusion;
-                        }
-                    } catch (e) { console.error(e); }
-                }
-            }
-            alert("文字代碼合併完成！");
-        }
-
-        // 組長上傳組員 Word 檔自動解析填入
         function handleMemberDocUpload(input) {
             const file = input.files[0];
             if (!file) return;
@@ -400,95 +315,100 @@
             reader.onload = function(loadEvent) {
                 mammoth.extractRawText({ arrayBuffer: loadEvent.target.result }).then(result => {
                     let text = result.value;
-                    // 簡易文字識別自動填入預覽
-                    if (text.includes("推薦方向")) document.getElementById('all-direction').value = text;
-                    else if (text.includes("分論點一")) document.getElementById('all-p1-arg').value = text;
-                    else if (text.includes("重申立場")) document.getElementById('all-conclusion').value = text;
-                    else document.getElementById('all-core').value = text;
-                    alert("組員 Word 檔內容已成功讀取並匯入預覽區！");
-                }).catch(err => { alert("讀取文件失敗：" + err); });
+                    groupArguments.push({ title: "組員上傳分論點", arg: text });
+                    renderLeaderArguments();
+                    alert("組員 Word 檔內容已成功讀取並加入分論點列表！");
+                });
             };
             reader.readAsArrayBuffer(file);
         }
 
-        // 老師上傳學生作業自動讀取
         function handleStudentDocUpload(input) {
             const file = input.files[0];
             if (!file) return;
             const reader = new FileReader();
             reader.onload = function(loadEvent) {
                 mammoth.extractRawText({ arrayBuffer: loadEvent.target.result }).then(result => {
-                    alert("已成功載入學生作業檔案內容，您可以直接在下方給予評分與反饋！");
+                    alert("已成功讀取學生作業檔案，您可以針對論點清晰度與論據充份性進行評分！");
                 });
             };
             reader.readAsArrayBuffer(file);
         }
 
-        function collectAllToLeaderPreview() {
-            const m1 = getModuleData(1), m2 = getModuleData(2), m3 = getModuleData(3), m4 = getModuleData(4);
-            if(m1.direction && !document.getElementById('all-direction').value) document.getElementById('all-direction').value = m1.direction;
-            if(m1.core && !document.getElementById('all-core').value) document.getElementById('all-core').value = m1.core;
-            if(m2.p1Title) document.getElementById('all-p1-title').value = m2.p1Title;
-            if(m2.p1Arg) document.getElementById('all-p1-arg').value = m2.p1Arg;
-            if(m2.p2Title) document.getElementById('all-p2-title').value = m2.p2Title;
-            if(m2.p2Arg) document.getElementById('all-p2-arg').value = m2.p2Arg;
-            if(m3.p3Title) document.getElementById('all-p3-title').value = m3.p3Title;
-            if(m3.p3Arg) document.getElementById('all-p3-arg').value = m3.p3Arg;
-            if(m3.p4Title) document.getElementById('all-p4-title').value = m3.p4Title;
-            if(m3.p4Arg) document.getElementById('all-p4-arg').value = m3.p4Arg;
-            if(m4.conclusion && !document.getElementById('all-conclusion').value) document.getElementById('all-conclusion').value = m4.conclusion;
+        function renderLeaderArguments() {
+            const container = document.getElementById('leader-arguments-container');
+            container.innerHTML = "";
+            groupArguments.forEach((item, index) => {
+                let div = document.createElement('div');
+                div.className = "space-y-2 p-3 border rounded-lg bg-slate-50 relative";
+                div.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-indigo-700">分論點 ${index + 1}</span>
+                        <button onclick="removeArgument(${index})" class="text-xs text-red-500 hover:text-red-700">刪除</button>
+                    </div>
+                    <input type="text" value="${item.title}" onchange="groupArguments[${index}].title=this.value" class="w-full p-2 text-xs border rounded bg-white" placeholder="分論點標題">
+                    <textarea rows="3" onchange="groupArguments[${index}].arg=this.value" class="w-full p-2 text-xs border rounded bg-white" placeholder="充份論據">${item.arg}</textarea>
+                `;
+                container.appendChild(div);
+            });
         }
 
-        // 導出 Word（支援組長交作業模式 與 老師批改發還模式）
+        function addEmptyArgumentField() {
+            groupArguments.push({ title: "", arg: "" });
+            renderLeaderArguments();
+        }
+
+        function removeArgument(index) {
+            groupArguments.splice(index, 1);
+            renderLeaderArguments();
+        }
+
         function exportWord(mode) {
             const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, AlignmentType } = window.docx;
 
             const groupName = document.getElementById('group-name').value || "小組";
             const members = document.getElementById('group-members').value || "未填寫";
-            const direction = document.getElementById('all-direction').value;
-            const core = document.getElementById('all-core').value;
-            const p1Title = document.getElementById('all-p1-title').value;
-            const p1Arg = document.getElementById('all-p1-arg').value;
-            const p2Title = document.getElementById('all-p2-title').value;
-            const p2Arg = document.getElementById('all-p2-arg').value;
-            const p3Title = document.getElementById('all-p3-title').value;
-            const p3Arg = document.getElementById('all-p3-arg').value;
-            const p4Title = document.getElementById('all-p4-title').value;
-            const p4Arg = document.getElementById('all-p4-arg').value;
-            const conclusion = document.getElementById('all-conclusion').value;
+            const direction = document.getElementById('all-direction').value || "酒店環境、住宿空間、設計裝潢";
+            const core = document.getElementById('all-core').value || "T酒店是環境優美、舒適，設計別具特色的酒店。";
+            const conclusion = document.getElementById('all-conclusion').value || "綜上所述，T酒店是旅遊度假的首選。";
 
             let docChildren = [
-                new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "T Hotel 小組研習工作紙", bold: true, size: 32, font: "Microsoft JhengHei" })] }),
+                new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "T Hotel 小組議論文研習工作紙", bold: true, size: 32, font: "Microsoft JhengHei" })] }),
                 new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 300 }, children: [new TextRun({ text: `組別：${groupName}   |   組員：${members}`, size: 24, font: "Microsoft JhengHei", color: "555555" })] })
             ];
 
-            // 若為老師批改模式，加入成績與評語區塊
             if (mode === 'teacher') {
                 const score = document.getElementById('teacher-score').value || "未評分";
-                const grade = document.getElementById('teacher-grade').value;
+                const gradeThesis = document.getElementById('teacher-grade-thesis').value;
+                const gradeEvidence = document.getElementById('teacher-grade-evidence').value;
                 const feedback = document.getElementById('teacher-feedback').value || "無";
 
-                docChildren.push(new Paragraph({ spacing: { after: 200 }, children: [new TextRun({ text: `【教師批改與評語】成績：${score} 分（等級：${grade}）`, bold: true, size: 24, color: "b91c1c", font: "Microsoft JhengHei" })] }));
-                docChildren.push(new Paragraph({ spacing: { after: 300 }, children: [new TextRun({ text: `老師反饋：${feedback}`, size: 22, color: "333333", font: "Microsoft JhengHei" })] }));
+                docChildren.push(new Paragraph({ spacing: { after: 100 }, children: [new TextRun({ text: `【教師批改與評估報告】總成績：${score} 分`, bold: true, size: 24, color: "b91c1c", font: "Microsoft JhengHei" })] }));
+                docChildren.push(new Paragraph({ spacing: { after: 100 }, children: [new TextRun({ text: `• 論點清晰度評級：${gradeThesis}`, size: 20, font: "Microsoft JhengHei" })] }));
+                docChildren.push(new Paragraph({ spacing: { after: 200 }, children: [new TextRun({ text: `• 論據充份性評級：${gradeEvidence}`, size: 20, font: "Microsoft JhengHei" })] }));
+                docChildren.push(new Paragraph({ spacing: { after: 300 }, children: [new TextRun({ text: `具體反饋與建議：${feedback}`, size: 20, color: "333333", font: "Microsoft JhengHei" })] }));
             }
 
             docChildren.push(new Paragraph({ spacing: { after: 200 }, children: [new TextRun({ text: "一、 小組討論內容撮要", bold: true, size: 24, font: "Microsoft JhengHei", color: "1e3a8a" })] }));
 
-            docChildren.push(new Table({
-                width: { size: 100, type: WidthType.PERCENTAGE },
-                rows: [
-                    new TableRow({ children: [new TableCell({ width: { size: 25, type: WidthType.PERCENTAGE }, children: [new Paragraph({ children: [new TextRun({ text: "推薦的方向", bold: true })] })] }), new TableCell({ width: { size: 75, type: WidthType.PERCENTAGE }, children: [new Paragraph({ children: [new TextRun({ text: direction })] })] })] }),
-                    new TableRow({ children: [new TableCell({ width: { size: 25, type: WidthType.PERCENTAGE }, children: [new Paragraph({ children: [new TextRun({ text: "建立中心論點", bold: true })] })] }), new TableCell({ width: { size: 75, type: WidthType.PERCENTAGE }, children: [new Paragraph({ children: [new TextRun({ text: core })] })] })] }),
-                    new TableRow({ children: [new TableCell({ width: { size: 25, type: WidthType.PERCENTAGE }, children: [new Paragraph({ children: [new TextRun({ text: `分論點一\n(${p1Title})`, bold: true })] })] }), new TableCell({ width: { size: 75, type: WidthType.PERCENTAGE }, children: [new Paragraph({ children: [new TextRun({ text: p1Arg })] })] })] }),
-                    new TableRow({ children: [new TableCell({ width: { size: 25, type: WidthType.PERCENTAGE }, children: [new Paragraph({ children: [new TextRun({ text: `分論點二\n(${p2Title})`, bold: true })] })] }), new TableCell({ width: { size: 75, type: WidthType.PERCENTAGE }, children: [new Paragraph({ children: [new TextRun({ text: p2Arg })] })] })] }),
-                    new TableRow({ children: [new TableCell({ width: { size: 25, type: WidthType.PERCENTAGE }, children: [new Paragraph({ children: [new TextRun({ text: `分論點三\n(${p3Title})`, bold: true })] })] }), new TableCell({ width: { size: 75, type: WidthType.PERCENTAGE }, children: [new Paragraph({ children: [new TextRun({ text: p3Arg })] })] })] }),
-                    new TableRow({ children: [new TableCell({ width: { size: 25, type: WidthType.PERCENTAGE }, children: [new Paragraph({ children: [new TextRun({ text: `其他分論點\n(${p4Title})`, bold: true })] })] }), new TableCell({ width: { size: 75, type: WidthType.PERCENTAGE }, children: [new Paragraph({ children: [new TextRun({ text: p4Arg })] })] })] }),
-                    new TableRow({ children: [new TableCell({ width: { size: 25, type: WidthType.PERCENTAGE }, children: [new Paragraph({ children: [new TextRun({ text: "重申立場／觀點", bold: true })] })] }), new TableCell({ width: { size: 75, type: WidthType.PERCENTAGE }, children: [new Paragraph({ children: [new TextRun({ text: conclusion })] })] })] })
-                ]
-            }));
+            let tableRows = [
+                new TableRow({ children: [new TableCell({ width: { size: 25, type: WidthType.PERCENTAGE }, children: [new Paragraph({ children: [new TextRun({ text: "推薦的方向", bold: true })] })] }), new TableCell({ width: { size: 75, type: WidthType.PERCENTAGE }, children: [new Paragraph({ children: [new TextRun({ text: direction })] })] })] }),
+                new TableRow({ children: [new TableCell({ width: { size: 25, type: WidthType.PERCENTAGE }, children: [new Paragraph({ children: [new TextRun({ text: "中心論點", bold: true })] })] }), new TableCell({ width: { size: 75, type: WidthType.PERCENTAGE }, children: [new Paragraph({ children: [new TextRun({ text: core })] })] })] })
+            ];
+
+            groupArguments.forEach((item, idx) => {
+                tableRows.push(new TableRow({ children: [
+                    new TableCell({ width: { size: 25, type: WidthType.PERCENTAGE }, children: [new Paragraph({ children: [new TextRun({ text: `分論點 ${idx + 1}\n(${item.title})`, bold: true })] })] }),
+                    new TableCell({ width: { size: 75, type: WidthType.PERCENTAGE }, children: [new Paragraph({ children: [new TextRun({ text: item.arg })] })] })
+                ]}));
+            });
+
+            tableRows.push(new TableRow({ children: [new TableCell({ width: { size: 25, type: WidthType.PERCENTAGE }, children: [new Paragraph({ children: [new TextRun({ text: "重申立場／觀點", bold: true })] })] }), new TableCell({ width: { size: 75, type: WidthType.PERCENTAGE }, children: [new Paragraph({ children: [new TextRun({ text: conclusion })] })] })] }));
+
+            docChildren.push(new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, rows: tableRows }));
 
             const doc = new Document({ sections: [{ properties: {}, children: docChildren }] });
-            let filename = mode === 'teacher' ? `T_Hotel_已批改作業_${groupName}.docx` : `T_Hotel_小組工作紙_${groupName}.docx`;
+            let filename = mode === 'teacher' ? `T_Hotel_已批改論證作業_${groupName}.docx` : `T_Hotel_小組工作紙_${groupName}.docx`;
             Packer.toBlob(doc).then(blob => { saveAs(blob, filename); });
         }
     </script>
