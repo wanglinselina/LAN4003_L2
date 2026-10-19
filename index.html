@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>T Hotel 議論文寫作協作與 AI 批改平台</title>
+    <title>T Hotel 議論文寫作協作平台</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- docx.js 用於生成 Word 文件 -->
@@ -19,14 +19,13 @@
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
-    <!-- 頂部導覽列 -->
+    <!-- 頂部導覽列（已移除老師批改按鈕） -->
     <header class="bg-indigo-700 text-white shadow-md">
         <div class="max-w-5xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center">
-            <h1 class="text-xl font-bold">🏨 T Hotel 議論文寫作協作與 AI 批改平台</h1>
+            <h1 class="text-xl font-bold">🏨 T Hotel 議論文寫作協作平台</h1>
             <div class="mt-2 sm:mt-0 flex gap-2">
                 <button onclick="switchMode('member')" id="btn-member" class="px-3 py-2 rounded-lg bg-indigo-800 text-white font-medium text-sm transition shadow">1. 組員個人填寫</button>
                 <button onclick="switchMode('leader')" id="btn-leader" class="px-3 py-2 rounded-lg bg-indigo-600 text-white font-medium text-sm transition hover:bg-indigo-800">2. 組長統整上傳</button>
-                <button onclick="switchMode('teacher')" id="btn-teacher" class="px-3 py-2 rounded-lg bg-indigo-600 text-white font-medium text-sm transition hover:bg-indigo-800">3. AI 智慧批改與反饋</button>
             </div>
         </div>
     </header>
@@ -134,70 +133,10 @@
                     </div>
 
                     <div class="pt-4">
-                        <button onclick="exportWord('leader')" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold text-base hover:bg-indigo-700 transition shadow-lg flex items-center justify-center gap-2">
+                        <button onclick="exportWord()" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold text-base hover:bg-indigo-700 transition shadow-lg flex items-center justify-center gap-2">
                             📥 生成並下載小組完整作業交給老師 (.docx)
                         </button>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ==================== 3. DeepSeek AI 智慧批改模式區 ==================== -->
-        <div id="section-teacher" class="space-y-6 hidden">
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-6">
-                <h2 class="text-lg font-bold text-slate-700 border-b pb-4">🤖 DeepSeek AI 智慧批改與反饋區</h2>
-
-                <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-200 space-y-3">
-                    <h3 class="text-sm font-bold text-indigo-900">🔑 設定 DeepSeek API Key</h3>
-                    <p class="text-xs text-indigo-700">請輸入您的 DeepSeek API Key（系統僅在您的瀏覽器暫存，安全可靠），以便啟用 AI 自動分析學生論點清晰度與論據充份性。</p>
-                    <input type="password" id="deepseek-api-key" class="w-full rounded-lg border border-indigo-300 p-2 text-xs bg-white" placeholder="sk-..." value="">
-                </div>
-
-                <div class="bg-amber-50 p-4 rounded-lg border border-amber-200 space-y-3">
-                    <h3 class="text-sm font-bold text-amber-800">📋 上傳學生小組作業 (.docx)</h3>
-                    <input type="file" id="upload-student-doc" accept=".docx" onchange="handleStudentDocUpload(this)" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-100 file:text-amber-800 hover:file:bg-amber-200">
-                </div>
-
-                <!-- AI 自動批改按鈕 -->
-                <div>
-                    <button onclick="runDeepSeekAI()" id="ai-btn" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-xl font-bold text-sm hover:opacity-90 transition shadow flex items-center justify-center gap-2">
-                        ✨ 啟動 DeepSeek AI 自動分析與批改
-                    </button>
-                </div>
-
-                <!-- 批改結果顯示區 -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">建議總成績（滿分 100）</label>
-                        <input type="number" id="teacher-score" class="w-full rounded-lg border border-slate-300 p-2.5 text-sm font-bold text-indigo-700" placeholder="AI 評定分數">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">論點清晰度評級</label>
-                        <select id="teacher-grade-thesis" class="w-full rounded-lg border border-slate-300 p-2.5 text-sm bg-white">
-                            <option value="各分論點清晰明確，具備具體特質">各分論點清晰明確，具備具體特質</option>
-                            <option value="論點尚算清晰，唯部分用詞較籠統">論點尚算清晰，唯部分用詞較籠統</option>
-                            <option value="論點模糊，未能清晰點出核心">論點模糊，未能清晰點出核心</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">論據充份性評級</label>
-                        <select id="teacher-grade-evidence" class="w-full rounded-lg border border-slate-300 p-2.5 text-sm bg-white">
-                            <option value="論據充份，且清楚確實引述資料來源">論據充份，且清楚確實引述資料來源</option>
-                            <option value="論據尚算充份，惟資料出處交代不夠完整">論據尚算充份，惟資料出處交代不夠完整</option>
-                            <option value="論據空泛，未有確實引述相應資料">論據空泛，未有確實引述相應資料</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">DeepSeek AI 詳盡反饋與建議</label>
-                    <textarea id="teacher-feedback" rows="5" class="w-full rounded-lg border border-slate-300 p-2.5 text-sm" placeholder="AI 分析結果將顯示於此，老師亦可手動修改補充..."></textarea>
-                </div>
-
-                <div class="pt-4 border-t">
-                    <button onclick="exportWord('teacher')" class="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold text-base hover:bg-emerald-700 transition shadow-lg flex items-center justify-center gap-2">
-                        📥 導出包含【DeepSeek AI 批改與反饋】的 Word 檔案發還學生
-                    </button>
                 </div>
             </div>
         </div>
@@ -206,29 +145,24 @@
 
     <!-- 頁尾 -->
     <footer class="bg-slate-200 text-slate-600 text-center py-4 text-xs mt-auto">
-        T Hotel 議論文寫作協作與 AI 批改平台 © 2026
+        T Hotel 議論文寫作協作平台 © 2026
     </footer>
 
     <!-- JavaScript 邏輯控制 -->
     <script>
         let groupArguments = [];
-        let rawStudentTextForAI = "";
 
         function switchMode(mode) {
             const memberSec = document.getElementById('section-member');
             const leaderSec = document.getElementById('section-leader');
-            const teacherSec = document.getElementById('section-teacher');
             const btnMember = document.getElementById('btn-member');
             const btnLeader = document.getElementById('btn-leader');
-            const btnTeacher = document.getElementById('btn-teacher');
             const modeTip = document.getElementById('mode-tip');
 
             memberSec.classList.add('hidden');
             leaderSec.classList.add('hidden');
-            teacherSec.classList.add('hidden');
             btnMember.className = "px-3 py-2 rounded-lg bg-indigo-600 text-white font-medium text-sm transition hover:bg-indigo-800";
             btnLeader.className = "px-3 py-2 rounded-lg bg-indigo-600 text-white font-medium text-sm transition hover:bg-indigo-800";
-            btnTeacher.className = "px-3 py-2 rounded-lg bg-indigo-600 text-white font-medium text-sm transition hover:bg-indigo-800";
 
             if (mode === 'member') {
                 memberSec.classList.remove('hidden');
@@ -239,10 +173,6 @@
                 btnLeader.className = "px-3 py-2 rounded-lg bg-indigo-800 text-white font-medium text-sm transition shadow";
                 modeTip.innerText = "👑 當前為【組長模式】：請依序上傳各組員的 Word 檔進行統整預覽，確認後下載完整作業交給老師。";
                 renderLeaderArguments();
-            } else if (mode === 'teacher') {
-                teacherSec.classList.remove('hidden');
-                btnTeacher.className = "px-3 py-2 rounded-lg bg-indigo-800 text-white font-medium text-sm transition shadow";
-                modeTip.innerText = "🤖 當前為【AI 批改模式】：設定 API Key 並上傳學生作業，即可透過 DeepSeek AI 自動檢視學生的論點清晰度與論據充份性。";
             }
         }
 
@@ -293,7 +223,6 @@
                 reader.onload = function(loadEvent) {
                     mammoth.extractRawText({ arrayBuffer: loadEvent.target.result }).then(result => {
                         let text = result.value;
-                        // 簡單解析提取內容
                         let titleMatch = text.match(/分論點標題[：:]\s*(.*)/);
                         let argMatch = text.match(/充份論據[：:]\s*([\s\S]*)/);
                         
@@ -307,88 +236,6 @@
                 reader.readAsArrayBuffer(file);
             }
             alert("已成功讀取並匯入上傳的組員 Word 檔案！");
-        }
-
-        function handleStudentDocUpload(input) {
-            const file = input.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(loadEvent) {
-                mammoth.extractRawText({ arrayBuffer: loadEvent.target.result }).then(result => {
-                    rawStudentTextForAI = result.value;
-                    alert("學生作業 Word 檔已成功載入，您可以點擊上方按鈕進行 DeepSeek AI 智慧批改！");
-                });
-            };
-            reader.readAsArrayBuffer(file);
-        }
-
-        // 呼叫 DeepSeek API 進行智慧批改
-        async function runDeepSeekAI() {
-            const apiKey = document.getElementById('deepseek-api-key').value.trim();
-            if (!apiKey) {
-                alert("請先輸入您的 DeepSeek API Key！");
-                return;
-            }
-            if (!rawStudentTextForAI) {
-                alert("請先上傳學生的作業 Word 檔案！");
-                return;
-            }
-
-            const aiBtn = document.getElementById('ai-btn');
-            aiBtn.innerText = "⏳ DeepSeek AI 正在分析論點與論據中...";
-            aiBtn.disabled = true;
-
-            const prompt = `你是一位資深的中文科老師。現在需要批改一份關於香港 T Hotel 考察的議論文小組作業。
-批改重點考核兩個核心能力：
-1. 論點清晰度：分論點是否清晰明確、具備具體特質（例如：寫出「酒店環境優美寧靜」而非籠統的「酒店環境」）。
-2. 論據充份性：論據是否充份，且是否確實引述相應的資料來源、數據或旅客評語。
-
-以下是學生作業內容：
-"""
-${rawStudentTextForAI}
-"""
-
-請嚴格且專業地給出以下 JSON 格式回覆（切勿包含額外 markdown 標記外字眼，確保可被 JSON.parse 解析）：
-{
-  "score": 85,
-  "thesisGrade": "各分論點清晰明確，具備具體特質",
-  "evidenceGrade": "論據充份，且清楚確實引述資料來源",
-  "feedback": "詳細的批改反饋與改進建議（繁體中文）"
-}`;
-
-            try {
-                const response = await fetch("https://api.deepseek.com/chat/completions", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${apiKey}`
-                    },
-                    body: JSON.stringify({
-                        model: "deepseek-chat",
-                        messages: [{ role: "user", content: prompt }],
-                        temperature: 0.3
-                    })
-                });
-
-                const data = await response.json();
-                let resultText = data.choices[0].message.content;
-                // 清理 markdown code block
-                resultText = resultText.replace(/```json/g, '').replace(/```/g, '').trim();
-                let aiResult = JSON.parse(resultText);
-
-                document.getElementById('teacher-score').value = aiResult.score || 85;
-                document.getElementById('teacher-grade-thesis').value = aiResult.thesisGrade || "論點尚算清晰，唯部分用詞較籠統";
-                document.getElementById('teacher-grade-evidence').value = aiResult.evidenceGrade || "論據尚算充份，惟資料出處交代不夠完整";
-                document.getElementById('teacher-feedback').value = aiResult.feedback || "AI 批改完成。";
-
-                alert("DeepSeek AI 智慧批改完成！");
-            } catch (error) {
-                console.error(error);
-                alert("AI 批改請求失敗，請檢查 API Key 是否正確或網絡連接。");
-            } finally {
-                aiBtn.innerText = "✨ 啟動 DeepSeek AI 自動分析與批改";
-                aiBtn.disabled = false;
-            }
         }
 
         function renderLeaderArguments() {
@@ -419,8 +266,8 @@ ${rawStudentTextForAI}
             renderLeaderArguments();
         }
 
-        function exportWord(mode) {
-            const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, AlignmentType } = window.docx;
+        function exportWord() {
+            const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType } = window.docx;
 
             const groupName = document.getElementById('group-name').value || "小組";
             const members = document.getElementById('group-members').value || "未填寫";
@@ -429,21 +276,9 @@ ${rawStudentTextForAI}
             const conclusion = document.getElementById('all-conclusion').value || "綜上所述，T酒店是旅遊度假的首選。";
 
             let docChildren = [
-                new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "T Hotel 小組議論文研習工作紙", bold: true, size: 32, font: "Microsoft JhengHei" })] }),
-                new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 300 }, children: [new TextRun({ text: `組別：${groupName}   |   組員：${members}`, size: 24, font: "Microsoft JhengHei", color: "555555" })] })
+                new Paragraph({ alignment: window.docx.AlignmentType.CENTER, children: [new TextRun({ text: "T Hotel 小組議論文研習工作紙", bold: true, size: 32, font: "Microsoft JhengHei" })] }),
+                new Paragraph({ alignment: window.docx.AlignmentType.CENTER, spacing: { after: 300 }, children: [new TextRun({ text: `組別：${groupName}   |   組員：${members}`, size: 24, font: "Microsoft JhengHei", color: "555555" })] })
             ];
-
-            if (mode === 'teacher') {
-                const score = document.getElementById('teacher-score').value || "未評分";
-                const gradeThesis = document.getElementById('teacher-grade-thesis').value;
-                const gradeEvidence = document.getElementById('teacher-grade-evidence').value;
-                const feedback = document.getElementById('teacher-feedback').value || "無";
-
-                docChildren.push(new Paragraph({ spacing: { after: 100 }, children: [new TextRun({ text: `【DeepSeek AI 批改與反饋報告】總成績：${score} 分`, bold: true, size: 24, color: "b91c1c", font: "Microsoft JhengHei" })] }));
-                docChildren.push(new Paragraph({ spacing: { after: 100 }, children: [new TextRun({ text: `• 論點清晰度評級：${gradeThesis}`, size: 20, font: "Microsoft JhengHei" })] }));
-                docChildren.push(new Paragraph({ spacing: { after: 200 }, children: [new TextRun({ text: `• 論據充份性評級：${gradeEvidence}`, size: 20, font: "Microsoft JhengHei" })] }));
-                docChildren.push(new Paragraph({ spacing: { after: 300 }, children: [new TextRun({ text: `AI 詳盡反饋與建議：${feedback}`, size: 20, color: "333333", font: "Microsoft JhengHei" })] }));
-            }
 
             docChildren.push(new Paragraph({ spacing: { after: 200 }, children: [new TextRun({ text: "一、 小組討論內容撮要", bold: true, size: 24, font: "Microsoft JhengHei", color: "1e3a8a" })] }));
 
@@ -464,8 +299,7 @@ ${rawStudentTextForAI}
             docChildren.push(new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, rows: tableRows }));
 
             const doc = new Document({ sections: [{ properties: {}, children: docChildren }] });
-            let filename = mode === 'teacher' ? `T_Hotel_AI已批改作業_${groupName}.docx` : `T_Hotel_小組完整工作紙_${groupName}.docx`;
-            Packer.toBlob(doc).then(blob => { saveAs(blob, filename); });
+            Packer.toBlob(doc).then(blob => { saveAs(blob, `T_Hotel_小組完整工作紙_${groupName}.docx`); });
         }
     </script>
 </body>
